@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/domain"
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/internal/tokenutil"
+	"main/domain"
+	"main/internal/tokenutil"
+
 	"github.com/gin-gonic/gin"
 )
 
