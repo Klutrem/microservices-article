@@ -1,26 +1,34 @@
 package route
 
 import (
-	"time"
-
-	"main/api/middleware"
-	"main/bootstrap"
-	"main/pkg/postgresql"
-
-	"github.com/gin-gonic/gin"
+	"go.uber.org/fx"
 )
 
-func Setup(env *bootstrap.Env, timeout time.Duration, db postgresql.Database, gin *gin.Engine) {
-	publicRouter := gin.Group("")
-	// All Public APIs
-	NewSignupRouter(env, timeout, db, publicRouter)
-	NewLoginRouter(env, timeout, db, publicRouter)
-	NewRefreshTokenRouter(env, timeout, db, publicRouter)
+var Module = fx.Options(
+	fx.Provide(NewUserRouter),
+	fx.Provide(NewTaskRouter),
+	fx.Provide(NewRoutes),
+)
 
-	protectedRouter := gin.Group("")
-	// Middleware to verify AccessToken
-	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
-	// All Private APIs
-	NewProfileRouter(env, timeout, db, protectedRouter)
-	NewTaskRouter(env, timeout, db, protectedRouter)
+type Routes []Route
+
+// Route interface
+type Route interface {
+	Setup()
+}
+
+func NewRoutes(
+	taskroutes TaskRouter,
+	userroutes UserRouter,
+) Routes {
+	return Routes{
+		taskroutes,
+		userroutes,
+	}
+}
+
+func (r Routes) Setup() {
+	for _, route := range r {
+		route.Setup()
+	}
 }

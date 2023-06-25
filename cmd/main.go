@@ -1,28 +1,33 @@
 package main
 
 import (
-	"time"
-
-	route "main/api/route"
 	"main/bootstrap"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// fx.New()
 
-	app := bootstrap.App()
+	// app := bootstrap.App()
 
-	env := app.Env
+	// env := app.Env
 
-	db := app.Postgres.Database()
-	defer app.CloseDBConnection()
+	// db := app.Postgres.Database()
+	// defer app.CloseDBConnection()
 
-	timeout := time.Duration(env.ContextTimeout) * time.Second
+	// timeout := time.Duration(env.ContextTimeout) * time.Second
 
-	gin := gin.Default()
+	// gin := gin.Default()
 
-	route.Setup(env, timeout, db, gin)
+	// route.Setup(env, timeout, db, gin)
 
-	gin.Run(env.ServerAddress)
+	// gin.Run(env.ServerAddress)
+	// err := bootstrap.RootApp.Execute()
+	// if err != nil {
+	// 	return
+	// }
+
+	err := bootstrap.RootApp.Command.Execute()
+	if err != nil {
+		return
+	}
 }

@@ -15,9 +15,12 @@ type SignupResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-type SignupUsecase interface {
+type UserUsecase interface {
 	Create(c context.Context, user *User) error
 	GetUserByEmail(c context.Context, email string) (User, error)
-	CreateAccessToken(user *User, secret string, expiry int) (accessToken string, err error)
-	CreateRefreshToken(user *User, secret string, expiry int) (refreshToken string, err error)
+	GetProfileByID(c context.Context, userID string) (*Profile, error)
+	GetUserByID(c context.Context, email string) (User, error)
+	CreateAccessToken(user *User) (accessToken string, err error)
+	CreateRefreshToken(user *User) (refreshToken string, err error)
+	ExtractIDFromToken(requestToken string) (string, error)
 }

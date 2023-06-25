@@ -8,4 +8,4 @@ WORKDIR /app
 
 RUN go build -o main cmd/main.go
 
-CMD ["/app/main"]
+CMD ["/app/main", "main"]
