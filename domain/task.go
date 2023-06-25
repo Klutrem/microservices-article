@@ -5,13 +5,13 @@ import (
 )
 
 const (
-	CollectionTask = "tasks"
+	TaskTable = "tasks"
 )
 
 type Task struct {
-	ID     int    `bson:"_id" json:"-"`
-	Title  string `bson:"title" form:"title" binding:"required" json:"title"`
-	UserID int    `bson:"userID" json:"-"`
+	ID     int    `db:"id" json:"-"`
+	Title  string `db:"title" form:"title" binding:"required" json:"title"`
+	UserID int    `db:"userID" json:"-"`
 }
 
 type TaskInfrastructure interface {
