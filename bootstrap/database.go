@@ -1,56 +1,37 @@
 package bootstrap
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"time"
 
-	"main/pkg/mongo"
+	"main/pkg/postgresql"
 )
 
-func NewMongoDatabase(env *Env) mongo.Client {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
+func NewPostgresClient(env *Env) postgresql.Client {
 	dbHost := env.DBHost
 	dbPort := env.DBPort
 	dbUser := env.DBUser
 	dbPass := env.DBPass
+	dbName := env.DBName
 
-	mongodbURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", dbUser, dbPass, dbHost, dbPort)
-
+	var dbURI string
 	if dbUser == "" || dbPass == "" {
-		mongodbURI = fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
+		dbURI = fmt.Sprintf("postgres://%s:%s/%s", dbHost, dbPort, dbName)
+	} else {
+		dbURI = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 	}
-
-	client, err := mongo.NewClient(mongodbURI)
+	client, err := postgresql.NewClient(dbURI)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
 
 	return client
 }
 
-func CloseMongoDBConnection(client mongo.Client) {
+func ClosePostgresConnection(client postgresql.Client) {
 	if client == nil {
 		return
 	}
 
-	err := client.Disconnect(context.TODO())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Connection to MongoDB closed.")
+	client.Disconnect()
 }

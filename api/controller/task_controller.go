@@ -2,11 +2,11 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"main/domain"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TaskController struct {
@@ -23,9 +23,9 @@ func (tc *TaskController) Create(c *gin.Context) {
 	}
 
 	userID := c.GetString("x-user-id")
-	task.ID = primitive.NewObjectID()
+	task.ID = 2
 
-	task.UserID, err = primitive.ObjectIDFromHex(userID)
+	task.UserID, err = strconv.Atoi(userID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return

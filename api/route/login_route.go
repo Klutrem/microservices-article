@@ -7,13 +7,13 @@ import (
 	"main/bootstrap"
 	"main/domain"
 	"main/infrastructure"
-	"main/pkg/mongo"
+	"main/pkg/postgresql"
 	"main/usecase"
 
 	"github.com/gin-gonic/gin"
 )
 
-func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db mongo.Database, group *gin.RouterGroup) {
+func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db postgresql.Database, group *gin.RouterGroup) {
 	ur := infrastructure.NewUserInfrastructure(db, domain.CollectionUser)
 	lc := &controller.LoginController{
 		LoginUsecase: usecase.NewLoginUsecase(ur, timeout),

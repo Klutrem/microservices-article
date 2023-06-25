@@ -1,19 +1,21 @@
 package bootstrap
 
-import "main/pkg/mongo"
+import (
+	"main/pkg/postgresql"
+)
 
 type Application struct {
-	Env   *Env
-	Mongo mongo.Client
+	Env      *Env
+	Postgres postgresql.Client
 }
 
 func App() Application {
 	app := &Application{}
 	app.Env = NewEnv()
-	app.Mongo = NewMongoDatabase(app.Env)
+	app.Postgres = NewPostgresClient(app.Env)
 	return *app
 }
 
 func (app *Application) CloseDBConnection() {
-	CloseMongoDBConnection(app.Mongo)
+	ClosePostgresConnection(app.Postgres)
 }

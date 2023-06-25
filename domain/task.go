@@ -2,8 +2,6 @@ package domain
 
 import (
 	"context"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -11,9 +9,9 @@ const (
 )
 
 type Task struct {
-	ID     primitive.ObjectID `bson:"_id" json:"-"`
-	Title  string             `bson:"title" form:"title" binding:"required" json:"title"`
-	UserID primitive.ObjectID `bson:"userID" json:"-"`
+	ID     int    `bson:"_id" json:"-"`
+	Title  string `bson:"title" form:"title" binding:"required" json:"title"`
+	UserID int    `bson:"userID" json:"-"`
 }
 
 type TaskInfrastructure interface {

@@ -4,70 +4,48 @@ import (
 	"context"
 
 	"main/domain"
-	"main/pkg/mongo"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"main/pkg/postgresql"
 )
 
 type userInfrastructure struct {
-	database   mongo.Database
-	collection string
+	database postgresql.Database
+	table    string
 }
 
-func NewUserInfrastructure(db mongo.Database, collection string) domain.UserInfrastructure {
+func NewUserInfrastructure(db postgresql.Database, table string) domain.UserInfrastructure {
 	return &userInfrastructure{
-		database:   db,
-		collection: collection,
+		database: db,
+		table:    table,
 	}
 }
 
 func (ur *userInfrastructure) Create(c context.Context, user *domain.User) error {
-	collection := ur.database.Collection(ur.collection)
-
-	_, err := collection.InsertOne(c, user)
+	query := "INSERT INTO " + ur.table + " (email, password, name) VALUES (:email, :password, :name)"
+	_, err := ur.database.NamedExec(query, user)
 
 	return err
 }
 
 func (ur *userInfrastructure) Fetch(c context.Context) ([]domain.User, error) {
-	collection := ur.database.Collection(ur.collection)
-
-	opts := options.Find().SetProjection(bson.D{{Key: "password", Value: 0}})
-	cursor, err := collection.Find(c, bson.D{}, opts)
-
-	if err != nil {
-		return nil, err
-	}
-
+	query := "SELECT * FROM " + ur.table
 	var users []domain.User
-
-	err = cursor.All(c, &users)
-	if users == nil {
-		return []domain.User{}, err
-	}
+	err := ur.database.Select(&users, query)
 
 	return users, err
 }
 
 func (ur *userInfrastructure) GetByEmail(c context.Context, email string) (domain.User, error) {
-	collection := ur.database.Collection(ur.collection)
+	query := "SELECT * FROM " + ur.table + " WHERE email = $1"
 	var user domain.User
-	err := collection.FindOne(c, bson.M{"email": email}).Decode(&user)
+	err := ur.database.Get(&user, query, email)
+
 	return user, err
 }
 
 func (ur *userInfrastructure) GetByID(c context.Context, id string) (domain.User, error) {
-	collection := ur.database.Collection(ur.collection)
-
+	query := "SELECT * FROM " + ur.table + " WHERE id = $1"
 	var user domain.User
+	err := ur.database.Get(&user, query, id)
 
-	idHex, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return user, err
-	}
-
-	err = collection.FindOne(c, bson.M{"_id": idHex}).Decode(&user)
 	return user, err
 }

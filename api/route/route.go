@@ -5,12 +5,12 @@ import (
 
 	"main/api/middleware"
 	"main/bootstrap"
-	"main/pkg/mongo"
+	"main/pkg/postgresql"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Setup(env *bootstrap.Env, timeout time.Duration, db mongo.Database, gin *gin.Engine) {
+func Setup(env *bootstrap.Env, timeout time.Duration, db postgresql.Database, gin *gin.Engine) {
 	publicRouter := gin.Group("")
 	// All Public APIs
 	NewSignupRouter(env, timeout, db, publicRouter)

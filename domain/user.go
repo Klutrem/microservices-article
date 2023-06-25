@@ -2,8 +2,6 @@ package domain
 
 import (
 	"context"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -11,10 +9,10 @@ const (
 )
 
 type User struct {
-	ID       primitive.ObjectID `bson:"_id"`
-	Name     string             `bson:"name"`
-	Email    string             `bson:"email"`
-	Password string             `bson:"password"`
+	ID       int    `db:"id" json:"id,omitempty"`
+	Name     string `db:"name" json:"name"`
+	Email    string `db:"email" json:"email"`
+	Password string `db:"password" json:"password"`
 }
 
 type UserInfrastructure interface {

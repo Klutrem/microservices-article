@@ -4,51 +4,32 @@ import (
 	"context"
 
 	"main/domain"
-	"main/pkg/mongo"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"main/pkg/postgresql"
 )
 
 type taskInfrastructure struct {
-	database   mongo.Database
-	collection string
+	db    postgresql.Database
+	table string
 }
 
-func NewTaskInfrastructure(db mongo.Database, collection string) domain.TaskInfrastructure {
+func NewTaskInfrastructure(db postgresql.Database, table string) domain.TaskInfrastructure {
 	return &taskInfrastructure{
-		database:   db,
-		collection: collection,
+		db:    db,
+		table: table,
 	}
 }
 
 func (tr *taskInfrastructure) Create(c context.Context, task *domain.Task) error {
-	collection := tr.database.Collection(tr.collection)
-
-	_, err := collection.InsertOne(c, task)
+	query := "INSERT INTO " + tr.table + " (user_id, name, description) VALUES (:user_id, :name, :description)"
+	_, err := tr.db.NamedExec(query, task)
 
 	return err
 }
 
 func (tr *taskInfrastructure) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {
-	collection := tr.database.Collection(tr.collection)
-
+	query := "SELECT * FROM " + tr.table + " WHERE user_id = $1"
 	var tasks []domain.Task
-
-	idHex, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return tasks, err
-	}
-
-	cursor, err := collection.Find(c, bson.M{"userID": idHex})
-	if err != nil {
-		return nil, err
-	}
-
-	err = cursor.All(c, &tasks)
-	if tasks == nil {
-		return []domain.Task{}, err
-	}
+	err := tr.db.Select(&tasks, query, userID)
 
 	return tasks, err
 }

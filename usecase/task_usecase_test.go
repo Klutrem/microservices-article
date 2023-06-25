@@ -12,20 +12,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestFetchByUserID(t *testing.T) {
 	mockTaskRepository := new(mocks.TaskRepository)
-	userObjectID := primitive.NewObjectID()
-	userID := userObjectID.Hex()
+	userObjectID := 2
+	userID := string(rune(userObjectID))
 
 	t.Run("success", func(t *testing.T) {
 
 		mockTask := domain.Task{
-			ID:     primitive.NewObjectID(),
+			ID:     1,
 			Title:  "Test Title",
-			UserID: userObjectID,
+			UserID: 2,
 		}
 
 		mockListTask := make([]domain.Task, 0)
