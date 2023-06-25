@@ -6,6 +6,6 @@ ADD . /app
 
 WORKDIR /app
 
-RUN go build -o main cmd/main.go
+RUN go build -o main main.go
 
 CMD ["/app/main", "main"]
