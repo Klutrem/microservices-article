@@ -7,7 +7,7 @@ import (
 
 	"main/domain"
 	"main/infrastructure"
-	"main/mongo/mocks"
+	"main/pkg/mongo/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

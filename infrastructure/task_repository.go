@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"main/domain"
-	"main/mongo"
+	"main/pkg/mongo"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

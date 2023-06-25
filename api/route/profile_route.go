@@ -7,7 +7,7 @@ import (
 	"main/bootstrap"
 	"main/domain"
 	"main/infrastructure"
-	"main/mongo"
+	"main/pkg/mongo"
 	"main/usecase"
 
 	"github.com/gin-gonic/gin"

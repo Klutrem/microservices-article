@@ -1,6 +1,6 @@
 package bootstrap
 
-import "main/mongo"
+import "main/pkg/mongo"
 
 type Application struct {
 	Env   *Env

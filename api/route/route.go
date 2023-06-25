@@ -5,7 +5,7 @@ import (
 
 	"main/api/middleware"
 	"main/bootstrap"
-	"main/mongo"
+	"main/pkg/mongo"
 
 	"github.com/gin-gonic/gin"
 )

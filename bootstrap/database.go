@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"main/mongo"
+	"main/pkg/mongo"
 )
 
 func NewMongoDatabase(env *Env) mongo.Client {

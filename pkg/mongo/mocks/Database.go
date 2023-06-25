@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	mongo "main/mongo"
+	mongo "main/pkg/mongo"
 	mock "github.com/stretchr/testify/mock"
 )
 
