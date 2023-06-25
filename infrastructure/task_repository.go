@@ -1,4 +1,4 @@
-package repository
+package infrastructure
 
 import (
 	"context"
@@ -10,19 +10,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type taskRepository struct {
+type taskInfrastructure struct {
 	database   mongo.Database
 	collection string
 }
 
-func NewTaskRepository(db mongo.Database, collection string) domain.TaskRepository {
-	return &taskRepository{
+func NewTaskInfrastructure(db mongo.Database, collection string) domain.TaskInfrastructure {
+	return &taskInfrastructure{
 		database:   db,
 		collection: collection,
 	}
 }
 
-func (tr *taskRepository) Create(c context.Context, task *domain.Task) error {
+func (tr *taskInfrastructure) Create(c context.Context, task *domain.Task) error {
 	collection := tr.database.Collection(tr.collection)
 
 	_, err := collection.InsertOne(c, task)
@@ -30,7 +30,7 @@ func (tr *taskRepository) Create(c context.Context, task *domain.Task) error {
 	return err
 }
 
-func (tr *taskRepository) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {
+func (tr *taskInfrastructure) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {
 	collection := tr.database.Collection(tr.collection)
 
 	var tasks []domain.Task

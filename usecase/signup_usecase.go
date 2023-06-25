@@ -9,27 +9,27 @@ import (
 )
 
 type signupUsecase struct {
-	userRepository domain.UserRepository
-	contextTimeout time.Duration
+	userInfrastructure domain.UserInfrastructure
+	contextTimeout     time.Duration
 }
 
-func NewSignupUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.SignupUsecase {
+func NewSignupUsecase(userInfrastructure domain.UserInfrastructure, timeout time.Duration) domain.SignupUsecase {
 	return &signupUsecase{
-		userRepository: userRepository,
-		contextTimeout: timeout,
+		userInfrastructure: userInfrastructure,
+		contextTimeout:     timeout,
 	}
 }
 
 func (su *signupUsecase) Create(c context.Context, user *domain.User) error {
 	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
 	defer cancel()
-	return su.userRepository.Create(ctx, user)
+	return su.userInfrastructure.Create(ctx, user)
 }
 
 func (su *signupUsecase) GetUserByEmail(c context.Context, email string) (domain.User, error) {
 	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
 	defer cancel()
-	return su.userRepository.GetByEmail(ctx, email)
+	return su.userInfrastructure.GetByEmail(ctx, email)
 }
 
 func (su *signupUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {

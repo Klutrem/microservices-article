@@ -8,14 +8,14 @@ import (
 )
 
 type profileUsecase struct {
-	userRepository domain.UserRepository
-	contextTimeout time.Duration
+	userInfrastructure domain.UserInfrastructure
+	contextTimeout     time.Duration
 }
 
-func NewProfileUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.ProfileUsecase {
+func NewProfileUsecase(userInfrastructure domain.UserInfrastructure, timeout time.Duration) domain.ProfileUsecase {
 	return &profileUsecase{
-		userRepository: userRepository,
-		contextTimeout: timeout,
+		userInfrastructure: userInfrastructure,
+		contextTimeout:     timeout,
 	}
 }
 
@@ -23,7 +23,7 @@ func (pu *profileUsecase) GetProfileByID(c context.Context, userID string) (*dom
 	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
 	defer cancel()
 
-	user, err := pu.userRepository.GetByID(ctx, userID)
+	user, err := pu.userInfrastructure.GetByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

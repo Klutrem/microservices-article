@@ -1,4 +1,4 @@
-package repository_test
+package infrastructure_test
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"main/domain"
+	"main/infrastructure"
 	"main/mongo/mocks"
-	"main/repository"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -40,7 +40,7 @@ func TestCreate(t *testing.T) {
 
 		databaseHelper.On("Collection", collectionName).Return(collectionHelper)
 
-		ur := repository.NewUserRepository(databaseHelper, collectionName)
+		ur := infrastructure.NewUserInfrastructure(databaseHelper, collectionName)
 
 		err := ur.Create(context.Background(), mockUser)
 
@@ -54,7 +54,7 @@ func TestCreate(t *testing.T) {
 
 		databaseHelper.On("Collection", collectionName).Return(collectionHelper)
 
-		ur := repository.NewUserRepository(databaseHelper, collectionName)
+		ur := infrastructure.NewUserInfrastructure(databaseHelper, collectionName)
 
 		err := ur.Create(context.Background(), mockEmptyUser)
 

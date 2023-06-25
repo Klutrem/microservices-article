@@ -1,4 +1,4 @@
-package repository
+package infrastructure
 
 import (
 	"context"
@@ -11,19 +11,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type userRepository struct {
+type userInfrastructure struct {
 	database   mongo.Database
 	collection string
 }
 
-func NewUserRepository(db mongo.Database, collection string) domain.UserRepository {
-	return &userRepository{
+func NewUserInfrastructure(db mongo.Database, collection string) domain.UserInfrastructure {
+	return &userInfrastructure{
 		database:   db,
 		collection: collection,
 	}
 }
 
-func (ur *userRepository) Create(c context.Context, user *domain.User) error {
+func (ur *userInfrastructure) Create(c context.Context, user *domain.User) error {
 	collection := ur.database.Collection(ur.collection)
 
 	_, err := collection.InsertOne(c, user)
@@ -31,7 +31,7 @@ func (ur *userRepository) Create(c context.Context, user *domain.User) error {
 	return err
 }
 
-func (ur *userRepository) Fetch(c context.Context) ([]domain.User, error) {
+func (ur *userInfrastructure) Fetch(c context.Context) ([]domain.User, error) {
 	collection := ur.database.Collection(ur.collection)
 
 	opts := options.Find().SetProjection(bson.D{{Key: "password", Value: 0}})
@@ -51,14 +51,14 @@ func (ur *userRepository) Fetch(c context.Context) ([]domain.User, error) {
 	return users, err
 }
 
-func (ur *userRepository) GetByEmail(c context.Context, email string) (domain.User, error) {
+func (ur *userInfrastructure) GetByEmail(c context.Context, email string) (domain.User, error) {
 	collection := ur.database.Collection(ur.collection)
 	var user domain.User
 	err := collection.FindOne(c, bson.M{"email": email}).Decode(&user)
 	return user, err
 }
 
-func (ur *userRepository) GetByID(c context.Context, id string) (domain.User, error) {
+func (ur *userInfrastructure) GetByID(c context.Context, id string) (domain.User, error) {
 	collection := ur.database.Collection(ur.collection)
 
 	var user domain.User

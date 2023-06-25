@@ -6,15 +6,15 @@ import (
 	"main/api/controller"
 	"main/bootstrap"
 	"main/domain"
+	"main/infrastructure"
 	"main/mongo"
-	"main/repository"
 	"main/usecase"
 
 	"github.com/gin-gonic/gin"
 )
 
 func NewRefreshTokenRouter(env *bootstrap.Env, timeout time.Duration, db mongo.Database, group *gin.RouterGroup) {
-	ur := repository.NewUserRepository(db, domain.CollectionUser)
+	ur := infrastructure.NewUserInfrastructure(db, domain.CollectionUser)
 	rtc := &controller.RefreshTokenController{
 		RefreshTokenUsecase: usecase.NewRefreshTokenUsecase(ur, timeout),
 		Env:                 env,

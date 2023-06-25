@@ -16,7 +16,7 @@ type Task struct {
 	UserID primitive.ObjectID `bson:"userID" json:"-"`
 }
 
-type TaskRepository interface {
+type TaskInfrastructure interface {
 	Create(c context.Context, task *Task) error
 	FetchByUserID(c context.Context, userID string) ([]Task, error)
 }
