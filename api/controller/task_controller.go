@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"main/domain"
 
@@ -22,14 +24,20 @@ func NewTaskController(usecase domain.TaskUsecase) TaskController {
 func (tc *TaskController) Create(c *gin.Context) {
 	var task domain.Task
 
-	err := c.ShouldBind(&task)
+	authHeader := c.Request.Header.Get("Authorization")
+	t := strings.Split(authHeader, " ")
+	userID, err := tc.TaskUsecase.ExtractIDFromToken(t[1])
+	if err != nil {
+		log.Println(userID)
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	err = c.ShouldBind(&task)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
-
-	userID := c.GetString("x-user-id")
-	task.ID = 2
 
 	task.UserID, err = strconv.Atoi(userID)
 	if err != nil {
@@ -49,7 +57,13 @@ func (tc *TaskController) Create(c *gin.Context) {
 }
 
 func (tc *TaskController) Fetch(c *gin.Context) {
-	userID := c.GetString("x-user-id")
+	authHeader := c.Request.Header.Get("Authorization")
+	t := strings.Split(authHeader, " ")
+	userID, err := tc.TaskUsecase.ExtractIDFromToken(t[1])
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
 
 	tasks, err := tc.TaskUsecase.FetchByUserID(c, userID)
 	if err != nil {

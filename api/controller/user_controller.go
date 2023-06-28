@@ -3,6 +3,7 @@ package controller
 import (
 	"main/domain"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -100,7 +101,13 @@ func (uc *UserController) Signup(c *gin.Context) {
 }
 
 func (uc *UserController) Fetch(c *gin.Context) {
-	userID := c.GetString("x-user-id")
+	authHeader := c.Request.Header.Get("Authorization")
+	t := strings.Split(authHeader, " ")
+	userID, err := uc.UserUsecase.ExtractIDFromToken(t[1])
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
 
 	profile, err := uc.UserUsecase.GetProfileByID(c, userID)
 	if err != nil {

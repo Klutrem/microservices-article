@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"strconv"
 
 	"main/domain"
 	"main/lib"
@@ -21,16 +22,20 @@ func NewTaskInfrastructure(db lib.PostgresClient) domain.TaskInfrastructure {
 }
 
 func (tr *taskInfrastructure) Create(c context.Context, task *domain.Task) error {
-	query := "INSERT INTO " + tr.table + " (user_id, name, description) VALUES (:user_id, :name, :description)"
+	query := "INSERT INTO " + tr.table + " (userid, title) VALUES (:userid, :title)"
 	_, err := tr.db.NamedExec(query, task)
 
 	return err
 }
 
 func (tr *taskInfrastructure) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {
-	query := "SELECT * FROM " + tr.table + " WHERE user_id = $1"
+	query := "SELECT * FROM " + tr.table + " WHERE userid = ($1)"
 	var tasks []domain.Task
-	err := tr.db.Select(&tasks, query, userID)
+	intid, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil, err
+	}
+	err = tr.db.Select(&tasks, query, intid)
 
 	return tasks, err
 }

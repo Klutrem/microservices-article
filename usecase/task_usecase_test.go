@@ -7,6 +7,7 @@ import (
 
 	"main/domain"
 	"main/domain/mocks"
+	"main/lib"
 	"main/usecase"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ func TestFetchByUserID(t *testing.T) {
 
 		mockTaskRepository.On("FetchByUserID", mock.Anything, userID).Return(mockListTask, nil).Once()
 
-		u := usecase.NewTaskUsecase(mockTaskRepository)
+		u := usecase.NewTaskUsecase(mockTaskRepository, lib.Env{})
 
 		list, err := u.FetchByUserID(context.Background(), userID)
 
@@ -45,7 +46,7 @@ func TestFetchByUserID(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		mockTaskRepository.On("FetchByUserID", mock.Anything, userID).Return(nil, errors.New("Unexpected")).Once()
 
-		u := usecase.NewTaskUsecase(mockTaskRepository)
+		u := usecase.NewTaskUsecase(mockTaskRepository, lib.Env{})
 
 		list, err := u.FetchByUserID(context.Background(), userID)
 

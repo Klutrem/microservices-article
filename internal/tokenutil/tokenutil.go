@@ -2,6 +2,7 @@ package tokenutil
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"main/domain"
@@ -13,7 +14,7 @@ func CreateAccessToken(user *domain.User, secret string, expiry int) (accessToke
 	exp := time.Now().Add(time.Hour * time.Duration(expiry)).Unix()
 	claims := &domain.JwtCustomClaims{
 		Name: user.Name,
-		ID:   string(rune(user.ID)),
+		ID:   strconv.Itoa(user.ID),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: exp,
 		},
@@ -28,7 +29,7 @@ func CreateAccessToken(user *domain.User, secret string, expiry int) (accessToke
 
 func CreateRefreshToken(user *domain.User, secret string, expiry int) (refreshToken string, err error) {
 	claimsRefresh := &domain.JwtCustomRefreshClaims{
-		ID: string(rune(user.ID)),
+		ID: strconv.Itoa(user.ID),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(expiry)).Unix(),
 		},

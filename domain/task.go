@@ -11,7 +11,7 @@ const (
 type Task struct {
 	ID     int    `db:"id" json:"-"`
 	Title  string `db:"title" form:"title" binding:"required" json:"title"`
-	UserID int    `db:"userID" json:"-"`
+	UserID int    `db:"userid" json:"-"`
 }
 
 type TaskInfrastructure interface {
@@ -22,4 +22,5 @@ type TaskInfrastructure interface {
 type TaskUsecase interface {
 	Create(c context.Context, task *Task) error
 	FetchByUserID(c context.Context, userID string) ([]Task, error)
+	ExtractIDFromToken(requestToken string) (string, error)
 }
