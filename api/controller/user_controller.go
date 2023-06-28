@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserController struct {
@@ -30,11 +29,6 @@ func (uc *UserController) Login(c *gin.Context) {
 	user, err := uc.UserUsecase.GetUserByEmail(c, request.Email)
 	if err != nil {
 		c.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "User not found with the given email"})
-		return
-	}
-
-	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)) != nil {
-		c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "Invalid credentials"})
 		return
 	}
 
@@ -72,17 +66,6 @@ func (uc *UserController) Signup(c *gin.Context) {
 		c.JSON(http.StatusConflict, domain.ErrorResponse{Message: "User already exists with the given email"})
 		return
 	}
-
-	encryptedPassword, err := bcrypt.GenerateFromPassword(
-		[]byte(request.Password),
-		bcrypt.DefaultCost,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	request.Password = string(encryptedPassword)
 
 	user := domain.User{
 		Name:     request.Name,
