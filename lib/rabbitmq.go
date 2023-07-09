@@ -8,7 +8,7 @@ import (
 )
 
 type Rabbitbroker struct {
-	Connection amqp.Connection
+	Channel *amqp.Channel
 }
 
 func NewRabbitbroker(env Env) Rabbitbroker {
@@ -37,4 +37,8 @@ func NewRabbitbroker(env Env) Rabbitbroker {
 	defer func() {
 		_ = ch.Close()
 	}()
+
+	return Rabbitbroker{
+		Channel: ch,
+	}
 }
