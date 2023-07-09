@@ -20,6 +20,10 @@ type Env struct {
 	RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
 	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
 	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
+	BrokerHost             string `mapstructure:"BROKER_HOST"`
+	BrokerPort             string `mapstructure:"BROKER_PORT"`
+	BrokerUser             string `mapstructure:"BROKER_USER"`
+	BrokerPass             string `mapstructure:"BROKER_PASS"`
 }
 
 func NewEnv() Env {
