@@ -42,14 +42,6 @@ func (u UserUsecase) GetUserByID(c context.Context, email string) (domain.User, 
 	return u.userInfrastructure.GetByID(c, email)
 }
 
-func (u UserUsecase) CreateAccessToken(user *domain.User) (accessToken string, err error) {
-	return tokenutil.CreateAccessToken(user, u.env.AccessTokenSecret, u.env.AccessTokenExpiryHour)
-}
-
-func (u UserUsecase) CreateRefreshToken(user *domain.User) (refreshToken string, err error) {
-	return tokenutil.CreateRefreshToken(user, u.env.RefreshTokenSecret, u.env.RefreshTokenExpiryHour)
-}
-
 func (u UserUsecase) ExtractIDFromToken(requestToken string) (string, error) {
 	return tokenutil.ExtractIDFromToken(requestToken, u.env.RefreshTokenSecret)
 }

@@ -33,24 +33,7 @@ func (uc *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := uc.UserUsecase.CreateAccessToken(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	refreshToken, err := uc.UserUsecase.CreateRefreshToken(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	loginResponse := domain.LoginResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}
-
-	c.JSON(http.StatusOK, loginResponse)
+	c.JSON(http.StatusOK, user.ID)
 }
 
 func (uc *UserController) Signup(c *gin.Context) {
@@ -80,24 +63,7 @@ func (uc *UserController) Signup(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := uc.UserUsecase.CreateAccessToken(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	refreshToken, err := uc.UserUsecase.CreateRefreshToken(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	signupResponse := domain.SignupResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}
-
-	c.JSON(http.StatusOK, signupResponse)
+	c.JSON(http.StatusOK, user.ID)
 }
 
 func (uc *UserController) Fetch(c *gin.Context) {
@@ -139,22 +105,5 @@ func (uc *UserController) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := uc.UserUsecase.CreateAccessToken(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	refreshToken, err := uc.UserUsecase.CreateRefreshToken(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	refreshTokenResponse := domain.RefreshTokenResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}
-
-	c.JSON(http.StatusOK, refreshTokenResponse)
+	c.JSON(http.StatusOK, user.ID)
 }

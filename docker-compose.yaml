@@ -1,31 +1,38 @@
-version: "3.8"
+version: '3'
+
+volumes:
+  postgres_data:
+      driver: local
 
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: go-backend
-    container_name: go-backend
-    restart: unless-stopped
-    env_file: .env
-    ports:
-      - "$PORT:$PORT"
-    depends_on:
-      - postgres
-
   postgres:
-    image: postgres:15.3
-    container_name: postgres
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      - POSTGRES_USER=$DB_USER
-      - POSTGRES_PASSWORD=$DB_PASS
-    ports:
-      - "$DB_PORT:$DB_PORT"
-    volumes:
-      - dbdata:/data/db
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+  keycloak:
+      image: keycloak/keycloak:21.1
+      command: start-dev
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_SCHEMA: public
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: admin
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+        #JDBC_PARAMS: "ssl=true"
+      ports:
+        - 8080:8080
+      depends_on:
+        - postgres
 
   rabbitmq:
     image: rabbitmq:3.9.29
@@ -33,12 +40,10 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - RABBITMQ_DEFAULT_USER=$RABBITMQ_USER
-      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_PASS
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=PoI456ZxC
     ports:
       - 5672:5672   # for sender and consumer connections
       - 15672:15672 # for serve RabbitMQ GUI
     volumes:
       - ~/rabbitmq:/var/lib/rabbitmq
-volumes:
-  dbdata:

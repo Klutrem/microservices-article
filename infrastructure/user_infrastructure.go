@@ -11,12 +11,14 @@ import (
 type userInfrastructure struct {
 	database postgresql.Database
 	table    string
+	broker   lib.Rabbitbroker
 }
 
-func NewUserInfrastructure(db lib.PostgresClient) domain.UserInfrastructure {
+func NewUserInfrastructure(db lib.PostgresClient, broker lib.Rabbitbroker) domain.UserInfrastructure {
 	return &userInfrastructure{
 		database: db.Client.Database(),
 		table:    domain.UserTable,
+		broker:   broker,
 	}
 }
 

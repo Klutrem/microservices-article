@@ -20,7 +20,5 @@ type UserUsecase interface {
 	GetUserByEmail(c context.Context, email string) (User, error)
 	GetProfileByID(c context.Context, userID string) (*Profile, error)
 	GetUserByID(c context.Context, email string) (User, error)
-	CreateAccessToken(user *User) (accessToken string, err error)
-	CreateRefreshToken(user *User) (refreshToken string, err error)
 	ExtractIDFromToken(requestToken string) (string, error)
 }
