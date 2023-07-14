@@ -43,5 +43,5 @@ func (u UserUsecase) GetUserByID(c context.Context, email string) (domain.User, 
 }
 
 func (u UserUsecase) ExtractIDFromToken(requestToken string) (string, error) {
-	return tokenutil.ExtractIDFromToken(requestToken, u.env.RefreshTokenSecret)
+	return tokenutil.ExtractIDFromToken(requestToken, u.env.PublicKey)
 }

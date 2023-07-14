@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Nerzal/gocloak/v13"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func IsAuthorized(requestToken string, secret string) (bool, error) {
@@ -36,34 +37,21 @@ func IsAuthorized(requestToken string, secret string) (bool, error) {
 }
 
 func ExtractIDFromToken(requestToken string, secret string) (string, error) {
-	// secrett, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("CLIENT_SECRET")))
-	// token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
-	// 	if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-	// 		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-	// 	}
-	// 	return secrett, nil
-	// })
+	// keyData, err := ioutil.ReadFile("public.key")
 
-	client := gocloak.NewClient("http://localhost:8080")
+	key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(secret))
 
-	token, claims, err := client.DecodeAccessToken(context.TODO(), requestToken, "aura")
+	// key, err := jwt.ParseRSAPublicKeyFromPEM(keyData)
+	token, err := jwt.Parse(requestToken, func(t *jwt.Token) (interface{}, error) {
+		if err != nil {
+			return false, errors.New("token invalid")
+		}
+		return key, nil
+	})
 	if err != nil {
 		return "", err
 	}
+	fmt.Println(token.Claims)
 
-	if !token.Valid || claims.Valid() != nil {
-		return "", errors.New("invalid token")
-	}
-	info, err := client.RetrospectToken(context.Background(), requestToken, "admin-cli", secret, "aura")
-	fmt.Println(info)
-	return "nil", nil
-	// claims, ok := claims.(jwt.Claims)
-
-	// fmt.Println(claims.GetSubject())
-
-	// if !ok && !token.Valid {
-	// 	return "", fmt.Errorf("invalid Token")
-	// }
-
-	// return claims["id"].(string), nil
+	return "", nil
 }
