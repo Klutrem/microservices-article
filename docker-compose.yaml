@@ -33,17 +33,3 @@ services:
         - 8080:8080
       depends_on:
         - postgres
-
-  rabbitmq:
-    image: rabbitmq:3.9.29
-    container_name: rabbitmq
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=PoI456ZxC
-    ports:
-      - 5672:5672   # for sender and consumer connections
-      - 15672:15672 # for serve RabbitMQ GUI
-    volumes:
-      - ~/rabbitmq:/var/lib/rabbitmq
