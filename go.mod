@@ -64,10 +64,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require (
-	github.com/Nerzal/gocloak/v13 v13.7.0
-	github.com/rabbitmq/amqp091-go v1.8.1
-)
+require github.com/Nerzal/gocloak/v13 v13.7.0
 
 require (
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
@@ -75,4 +72,5 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
+	go.uber.org/goleak v1.2.1 // indirect
 )

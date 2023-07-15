@@ -16,6 +16,7 @@ func NewUserRouter(controller controller.UserController, handler lib.RequestHand
 	return UserRouter{
 		controller: controller,
 		handler:    handler,
+		env:        env,
 	}
 }
 
@@ -23,8 +24,7 @@ func (ur UserRouter) Setup() {
 	group := ur.handler.Gin.Group("")
 	group.POST("/signup", ur.controller.Signup)
 	group.POST("/login", ur.controller.Login)
-	group.POST("/refresh", ur.controller.RefreshToken)
 
-	protected_group := ur.handler.Gin.Group("").Use(middleware.JwtAuthMiddleware(ur.env.AccessTokenSecret))
-	protected_group.GET("/profile", ur.controller.Fetch)
+	protectedGroup := ur.handler.Gin.Group("").Use(middleware.JwtAuthMiddleware(ur.env.PublicKey))
+	protectedGroup.GET("/profile", ur.controller.GetUserId)
 }

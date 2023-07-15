@@ -3,7 +3,6 @@ package controller
 import (
 	"main/domain"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,44 +65,25 @@ func (uc *UserController) Signup(c *gin.Context) {
 	c.JSON(http.StatusOK, user.ID)
 }
 
-func (uc *UserController) Fetch(c *gin.Context) {
-	authHeader := c.Request.Header.Get("Authorization")
-	t := strings.Split(authHeader, " ")
-	userID, err := uc.UserUsecase.ExtractIDFromToken(t[1])
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
+func (uc *UserController) GetUserId(c *gin.Context) {
+	// authHeader := c.Request.Header.Get("Authorization")
+	// t := strings.Split(authHeader, " ")
+	// userID, err := uc.UserUsecase.ExtractIDFromToken(t[1])
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+	// 	return
+	// }
+	id, ok := c.Get("user-id")
+	if !ok {
+		c.JSON(http.StatusForbidden, "unathorized")
 	}
+	c.JSON(http.StatusOK, id)
 
-	profile, err := uc.UserUsecase.GetProfileByID(c, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
+	// profile, err := uc.UserUsecase.GetProfileByID(c, userID)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+	// 	return
+	// }
 
-	c.JSON(http.StatusOK, profile)
-}
-
-func (uc *UserController) RefreshToken(c *gin.Context) {
-	var request domain.RefreshTokenRequest
-
-	err := c.ShouldBind(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	id, err := uc.UserUsecase.ExtractIDFromToken(request.RefreshToken)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "User not found"})
-		return
-	}
-
-	user, err := uc.UserUsecase.GetUserByID(c, id)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "User not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, user.ID)
+	// c.JSON(http.StatusOK, userID)
 }
