@@ -21,7 +21,7 @@ func NewTaskRouter(controller controller.TaskController, handler lib.RequestHand
 }
 
 func (tr TaskRouter) Setup() {
-	group := tr.handler.Gin.Group("").Use(middleware.JwtAuthMiddleware(tr.env.AccessTokenSecret))
+	group := tr.handler.Gin.Group("").Use(middleware.JwtAuthMiddleware(tr.env.PublicKey))
 	group.GET("/task", tr.controller.Fetch)
 	group.POST("/task", tr.controller.Create)
 }

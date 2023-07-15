@@ -19,6 +19,7 @@ type Env struct {
 	AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
 	RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
 	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
+	PublicKey              string `mapstructure:"PUBLIC_KEY"`
 	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
 	BrokerHost             string `mapstructure:"BROKER_HOST"`
 	BrokerPort             string `mapstructure:"BROKER_PORT"`
