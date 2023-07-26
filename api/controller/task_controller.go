@@ -1,23 +1,27 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"main/domain"
+	"main/lib"
 
 	"github.com/gin-gonic/gin"
 )
 
 type TaskController struct {
 	TaskUsecase domain.TaskUsecase
+	KafkaClient lib.KafkaClient
 }
 
-func NewTaskController(usecase domain.TaskUsecase) TaskController {
+func NewTaskController(usecase domain.TaskUsecase, kafka lib.KafkaClient) TaskController {
 	return TaskController{
 		TaskUsecase: usecase,
+		KafkaClient: kafka,
 	}
 }
 
@@ -72,4 +76,12 @@ func (tc *TaskController) Fetch(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tasks)
+}
+
+// I don't care, it won't have business logic, just consume the topic
+func (tc *TaskController) TestConsumeTopic(topic string) {
+	messages := tc.KafkaClient.Consume(topic)
+	for message := range messages {
+		fmt.Println(string(message.Value)) //replace this to service calling
+	}
 }

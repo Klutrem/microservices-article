@@ -24,4 +24,6 @@ func (tr TaskRouter) Setup() {
 	group := tr.handler.Gin.Group("").Use(middleware.JwtAuthMiddleware(tr.env.PublicKey))
 	group.GET("/task", tr.controller.Fetch)
 	group.POST("/task", tr.controller.Create)
+
+	go tr.controller.TestConsumeTopic("test") //run all functions with kafka topics handling
 }

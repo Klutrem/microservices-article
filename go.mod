@@ -67,7 +67,13 @@ require (
 require github.com/Nerzal/gocloak/v13 v13.7.0
 
 require (
-	github.com/IBM/sarama v1.40.0 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	gopkg.in/resty.v1 v1.10.3 // indirect
+)
+
+require (
+	github.com/IBM/sarama v1.40.0
+	github.com/Nerzal/gocloak v1.0.0
 	github.com/eapache/go-resiliency v1.3.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230111030713-bf00bc1b83b6 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
@@ -84,7 +90,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.3 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/klauspost/compress v1.15.14 // indirect
-	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
