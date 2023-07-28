@@ -45,6 +45,14 @@ func (cl *KafkaClient) Consume(topic string) <-chan *sarama.ConsumerMessage {
 	return consumer.Messages()
 }
 
+func (cl *KafkaClient) Reply(topic string, message string) {
+	value := sarama.StringEncoder(message)
+	cl.producer.Input() <- &sarama.ProducerMessage{
+		Topic: fmt.Sprint(topic, ".reply"),
+		Value: value,
+	}
+}
+
 func (cl *KafkaClient) Send(topic string, message string) {
 	value := sarama.StringEncoder(message)
 	cl.producer.Input() <- &sarama.ProducerMessage{

@@ -82,6 +82,15 @@ func (tc *TaskController) Fetch(c *gin.Context) {
 func (tc *TaskController) TestConsumeTopic(topic string) {
 	messages := tc.KafkaClient.Consume(topic)
 	for message := range messages {
-		fmt.Println(string(message.Value)) //replace this to service calling
+		fmt.Println(string(message.Value)) //replace this to service calling or other messages handling
+		tc.KafkaClient.Reply(topic, message.Timestamp.GoString())
+	}
+}
+
+func (tc *TaskController) TestReplyTopic(topic string) {
+	messages := tc.KafkaClient.Consume(topic)
+	for message := range messages {
+		log.Default().Println("getting reply on topic:", message.Topic)
+		log.Default().Println(string(message.Value))
 	}
 }
