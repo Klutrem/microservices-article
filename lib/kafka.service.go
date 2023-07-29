@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/IBM/sarama"
@@ -8,9 +9,17 @@ import (
 )
 
 type KafkaClient struct {
-	env      Env
-	consumer sarama.Consumer
-	producer sarama.AsyncProducer
+	env           Env
+	client        sarama.Client
+	producer      sarama.AsyncProducer
+	ConsumerGroup sarama.ConsumerGroup
+}
+
+type KafkaHandler interface {
+	Handle(topic string, message []byte)
+	Setup(sarama.ConsumerGroupSession) error
+	Cleanup(sarama.ConsumerGroupSession) error
+	ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error
 }
 
 func NewKafkaClient(env Env) KafkaClient {
@@ -26,23 +35,28 @@ func NewKafkaClient(env Env) KafkaClient {
 		log.Error(err)
 	}
 
-	consumer, err := sarama.NewConsumerFromClient(client)
+	group, err := sarama.NewConsumerGroupFromClient(env.KafkaGroup, client)
 	if err != nil {
 		log.Error(err)
 	}
 	return KafkaClient{
-		env:      env,
-		consumer: consumer,
-		producer: producer,
+		env:           env,
+		producer:      producer,
+		ConsumerGroup: group,
+		client:        client,
 	}
 }
 
-func (cl *KafkaClient) Consume(topic string) <-chan *sarama.ConsumerMessage {
-	consumer, err := cl.consumer.ConsumePartition(topic, 0, sarama.OffsetNewest)
+func (cl *KafkaClient) Consume(handler KafkaHandler, topics []string) {
+	consumer, err := sarama.NewConsumerGroupFromClient("test", cl.client)
 	if err != nil {
 		log.Error(err)
 	}
-	return consumer.Messages()
+	defer consumer.Close()
+
+	for {
+		consumer.Consume(context.Background(), topics[:], handler)
+	}
 }
 
 func (cl *KafkaClient) Reply(topic string, message string) {

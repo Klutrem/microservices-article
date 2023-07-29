@@ -1,12 +1,13 @@
 package route
 
 import (
+	TaskRoute "main/api/route/task"
+	UserRoute "main/api/route/user"
+
 	"go.uber.org/fx"
 )
 
 var Module = fx.Options(
-	fx.Provide(NewUserRouter),
-	fx.Provide(NewTaskRouter),
 	fx.Provide(NewRoutes),
 )
 
@@ -18,12 +19,12 @@ type Route interface {
 }
 
 func NewRoutes(
-	taskroutes TaskRouter,
-	userroutes UserRouter,
+	taskRoutes TaskRoute.TaskRouter,
+	userRoutes UserRoute.UserRouter,
 ) Routes {
 	return Routes{
-		taskroutes,
-		userroutes,
+		taskRoutes,
+		userRoutes,
 	}
 }
 

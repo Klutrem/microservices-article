@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"main/bootstrap"
-	"main/lib"
 )
 
 func main() {
@@ -14,15 +12,6 @@ func main() {
 	// 	panic(err)
 	// }
 	// fmt.Println(token.AccessToken)
-
-	kafkaClient := lib.NewKafkaClient(lib.Env{
-		BrokerHost: "localhost",
-		BrokerPort: "9092",
-	})
-
-	for i := 0; i < 100; i++ {
-		kafkaClient.Consume(fmt.Sprint("teeeest", i))
-	}
 
 	err := bootstrap.RootApp.Command.Execute()
 	if err != nil {

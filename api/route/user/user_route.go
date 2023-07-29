@@ -1,4 +1,4 @@
-package route
+package UserRoute
 
 import (
 	"main/api/controller"
