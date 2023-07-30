@@ -13,7 +13,7 @@ import (
 type KafkaClient struct {
 	env           Env
 	client        sarama.Client
-	producer      sarama.SyncProducer
+	producer      sarama.AsyncProducer
 	reader        sarama.Consumer
 	consumerGroup sarama.ConsumerGroup
 }
@@ -33,7 +33,7 @@ func NewKafkaClient(env Env) KafkaClient {
 		log.Error(err)
 	}
 
-	producer, err := sarama.NewSyncProducerFromClient(client)
+	producer, err := sarama.NewAsyncProducerFromClient(client)
 	if err != nil {
 		log.Error(err)
 	}
@@ -58,25 +58,35 @@ func (cl *KafkaClient) Consume(handler KafkaHandler, topics []string) {
 	}
 }
 
-func (cl *KafkaClient) Send(topic string, message []byte) (response []byte, err error) {
-	msg := sarama.ProducerMessage{
+func (cl *KafkaClient) Send(topic string, message []byte) {
+	value := sarama.StringEncoder(message)
+	cl.producer.Input() <- &sarama.ProducerMessage{
 		Topic: topic,
-		Value: sarama.ByteEncoder(message),
+		Value: value,
 	}
-	partition, offset, err := cl.producer.SendMessage(&msg)
-	if err != nil {
-		return nil, err
+}
+
+func (cl *KafkaClient) SendWithReply(topic string, message []byte) (response []byte, err error) {
+	value := sarama.StringEncoder(message)
+	cl.producer.Input() <- &sarama.ProducerMessage{
+		Topic: topic,
+		Value: value,
 	}
-	replyTopic := fmt.Sprintf(topic, ".reply")
+
+	replyTopic := topic + ".reply"
 	consumer, err := sarama.NewConsumerFromClient(cl.client)
 	if err != nil {
 		return nil, err
 	}
-	partitionConsumer, err := consumer.ConsumePartition(replyTopic, partition, offset)
+	defer consumer.Close()
+	offset := sarama.OffsetNewest
+	partitionConsumer, err := consumer.ConsumePartition(replyTopic, 0, offset)
 	if err != nil {
 		consumer.Close()
 		return nil, err
 	}
+	defer partitionConsumer.Close()
+
 	select {
 	case msg := <-partitionConsumer.Messages():
 		response = msg.Value

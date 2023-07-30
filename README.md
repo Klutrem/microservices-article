@@ -15,6 +15,14 @@
 - You need to access keycloak by `http://localhost:8080`, and import realm from `realm-export.json` 
 - Then, while running server, access token will be printed in console (it's temporary solution, will be removed, when we will have an authorization service)
 
+### Kafka
+
+- Should be a handler for consumer topics, like on api/route/task
+- For consumer topics you should also send a reply with simple send function (in handler you send already reply topic 
+to controller)
+- For sending topics, if you need reply (probably you will need it always), you should send messages by SendWithReply function. It will return response on reply topic
+- If it's kafka handler function, not http controller function, then you can return response (send on reply topic) inside this function. But if it's http controller function, you must call service, and send message inside service, get the response also inside service and return to controller
+
 ### How to run the test?
 
 ```bash

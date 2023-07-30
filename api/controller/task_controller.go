@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -78,11 +79,27 @@ func (tc *TaskController) Fetch(c *gin.Context) {
 	c.JSON(http.StatusOK, tasks)
 }
 
-// I don't care, it won't have business logic, just handling topic, but for real functions it must call service
-func (tc *TaskController) TestConsumeTopic(message []byte) {
-	fmt.Println("getting message from test topic:", string(message))
+func (tc *TaskController) TestReplyTopic(c *gin.Context) {
+	message, err := json.Marshal("test_message")
+	if err != nil {
+		c.JSON(500, err.Error())
+		return
+	}
+	response, err := tc.KafkaClient.SendWithReply(lib.TestReplyTopic, message) // shouldn't be like that, it should call service, and service should send to kafka
+	if err != nil {
+		c.JSON(500, err.Error())
+		return
+	}
+	c.JSON(200, string(response)) //it's better to unmarshal response to struct (json.Unmarshal(response, &struct))
 }
 
-func (tc *TaskController) TestReplyTopic(message []byte) {
+// I don't care, it won't have business logic, just handling topic, but for real functions it must call service
+// Don't forget to send reply on the reply topic
+func (tc *TaskController) TestConsumeTopic(replyTopic string, message []byte) {
+	fmt.Println("getting message from test topic:", string(message))
+	tc.KafkaClient.Send(replyTopic, []byte("all ok"))
+}
+
+func (tc *TaskController) TestSecondTopic(replyTopic string, message []byte) {
 	fmt.Println("getting message from second topic:", string(message))
 }

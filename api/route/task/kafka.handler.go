@@ -28,11 +28,12 @@ func (handler EventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, cl
 }
 
 func (handler EventHandler) Handle(topic string, message []byte) {
+	replyTopic := topic + ".reply"
 	switch topic {
 	case lib.TestTopic:
-		handler.controller.TestConsumeTopic(message)
+		handler.controller.TestConsumeTopic(replyTopic, message)
 	case lib.SecondTopic:
-		handler.controller.TestReplyTopic(message)
+		handler.controller.TestSecondTopic(replyTopic, message)
 	}
 }
 
