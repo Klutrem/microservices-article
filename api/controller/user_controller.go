@@ -21,7 +21,6 @@ func NewUserController(usecase domain.UserUsecase, kafka lib.KafkaClient) UserCo
 }
 
 func (uc *UserController) Login(c *gin.Context) {
-	uc.KafkaClient.Send("test", "test")
 	var request domain.LoginRequest
 
 	err := c.ShouldBind(&request)

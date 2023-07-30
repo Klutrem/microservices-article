@@ -2,7 +2,9 @@ package lib
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/IBM/sarama"
 	"github.com/opentracing/opentracing-go/log"
@@ -11,8 +13,9 @@ import (
 type KafkaClient struct {
 	env           Env
 	client        sarama.Client
-	producer      sarama.AsyncProducer
-	ConsumerGroup sarama.ConsumerGroup
+	producer      sarama.SyncProducer
+	reader        sarama.Consumer
+	consumerGroup sarama.ConsumerGroup
 }
 
 type KafkaHandler interface {
@@ -30,7 +33,7 @@ func NewKafkaClient(env Env) KafkaClient {
 		log.Error(err)
 	}
 
-	producer, err := sarama.NewAsyncProducerFromClient(client)
+	producer, err := sarama.NewSyncProducerFromClient(client)
 	if err != nil {
 		log.Error(err)
 	}
@@ -42,35 +45,47 @@ func NewKafkaClient(env Env) KafkaClient {
 	return KafkaClient{
 		env:           env,
 		producer:      producer,
-		ConsumerGroup: group,
+		consumerGroup: group,
 		client:        client,
 	}
 }
 
 func (cl *KafkaClient) Consume(handler KafkaHandler, topics []string) {
-	consumer, err := sarama.NewConsumerGroupFromClient("test", cl.client)
-	if err != nil {
-		log.Error(err)
-	}
-	defer consumer.Close()
+	defer cl.consumerGroup.Close()
 
 	for {
-		consumer.Consume(context.Background(), topics[:], handler)
+		cl.consumerGroup.Consume(context.Background(), topics[:], handler)
 	}
 }
 
-func (cl *KafkaClient) Reply(topic string, message string) {
-	value := sarama.StringEncoder(message)
-	cl.producer.Input() <- &sarama.ProducerMessage{
-		Topic: fmt.Sprint(topic, ".reply"),
-		Value: value,
-	}
-}
-
-func (cl *KafkaClient) Send(topic string, message string) {
-	value := sarama.StringEncoder(message)
-	cl.producer.Input() <- &sarama.ProducerMessage{
+func (cl *KafkaClient) Send(topic string, message []byte) (response []byte, err error) {
+	msg := sarama.ProducerMessage{
 		Topic: topic,
-		Value: value,
+		Value: sarama.ByteEncoder(message),
 	}
+	partition, offset, err := cl.producer.SendMessage(&msg)
+	if err != nil {
+		return nil, err
+	}
+	replyTopic := fmt.Sprintf(topic, ".reply")
+	consumer, err := sarama.NewConsumerFromClient(cl.client)
+	if err != nil {
+		return nil, err
+	}
+	partitionConsumer, err := consumer.ConsumePartition(replyTopic, partition, offset)
+	if err != nil {
+		consumer.Close()
+		return nil, err
+	}
+	select {
+	case msg := <-partitionConsumer.Messages():
+		response = msg.Value
+	case <-time.After(time.Second * 60):
+		consumer.Close()
+		return nil, errors.New("timeout waiting for reply message")
+	}
+	consumer.Close()
+
+	return response, nil
+
 }
