@@ -3,6 +3,8 @@ package bootstrap
 import (
 	"main/api/controller"
 	"main/api/route"
+	TaskRoute "main/api/route/task"
+	UserRoute "main/api/route/user"
 	"main/infrastructure"
 	"main/lib"
 	"main/usecase"
@@ -16,4 +18,6 @@ var CommonModules = fx.Options(
 	route.Module,
 	lib.Module,
 	controller.Module,
+	TaskRoute.Module,
+	UserRoute.Module,
 )

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"main/domain"
+	"main/lib"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,11 +10,13 @@ import (
 
 type UserController struct {
 	UserUsecase domain.UserUsecase
+	KafkaClient lib.KafkaClient
 }
 
-func NewUserController(usecase domain.UserUsecase) UserController {
+func NewUserController(usecase domain.UserUsecase, kafka lib.KafkaClient) UserController {
 	return UserController{
 		UserUsecase: usecase,
+		KafkaClient: kafka,
 	}
 }
 
