@@ -1,7 +1,7 @@
 package lib
 
 const (
-	TestTopic      = "story.list"
+	TestTopic      = "topic.test"
 	SecondTopic    = "second.topic"
 	TestReplyTopic = "topic"
 )

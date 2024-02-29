@@ -28,6 +28,7 @@ type KafkaHandler interface {
 func NewKafkaClient(env Env) KafkaClient {
 	addr := fmt.Sprint(env.BrokerHost, ":", env.BrokerPort)
 	conf := sarama.NewConfig()
+	conf.Consumer.Return.Errors = true
 	client, err := sarama.NewClient([]string{addr}, conf)
 	if err != nil {
 		log.Error(err)
@@ -42,6 +43,11 @@ func NewKafkaClient(env Env) KafkaClient {
 	if err != nil {
 		log.Error(err)
 	}
+	go func() {
+		for err := range group.Errors() {
+			log.Error(err)
+		}
+	}()
 	return KafkaClient{
 		env:           env,
 		producer:      producer,
@@ -50,9 +56,8 @@ func NewKafkaClient(env Env) KafkaClient {
 	}
 }
 
-func (cl *KafkaClient) Consume(handler KafkaHandler, topics []string) {
+func (cl KafkaClient) Consume(handler KafkaHandler, topics []string) {
 	defer cl.consumerGroup.Close()
-
 	for {
 		err := cl.consumerGroup.Consume(context.Background(), topics, handler)
 		if err != nil {

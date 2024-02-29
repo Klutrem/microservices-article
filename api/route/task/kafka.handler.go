@@ -11,6 +11,12 @@ type EventHandler struct {
 	controller controller.TaskController
 }
 
+func NewKafkaHandler(controller controller.TaskController) lib.KafkaHandler {
+	return EventHandler{
+		controller: controller,
+	}
+}
+
 func (handler EventHandler) Setup(session sarama.ConsumerGroupSession) error {
 	return nil
 }
@@ -35,8 +41,4 @@ func (handler EventHandler) Handle(topic string, message []byte) {
 	case lib.SecondTopic:
 		handler.controller.TestSecondTopic(replyTopic, message)
 	}
-}
-
-func NewKafkaHandler() lib.KafkaHandler {
-	return EventHandler{}
 }

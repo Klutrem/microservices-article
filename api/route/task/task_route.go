@@ -6,18 +6,20 @@ import (
 )
 
 type TaskRouter struct {
-	controller controller.TaskController
-	handler    lib.RequestHandler
-	kafka      lib.KafkaClient
-	env        lib.Env
+	controller   controller.TaskController
+	handler      lib.RequestHandler
+	kafkaHandler lib.KafkaHandler
+	kafka        lib.KafkaClient
+	env          lib.Env
 }
 
-func NewTaskRouter(controller controller.TaskController, handler lib.RequestHandler, env lib.Env, kafka lib.KafkaClient) TaskRouter {
+func NewTaskRouter(controller controller.TaskController, handler lib.RequestHandler, env lib.Env, kafka lib.KafkaClient, kafkaHandler lib.KafkaHandler) TaskRouter {
 	return TaskRouter{
-		controller: controller,
-		handler:    handler,
-		kafka:      kafka,
-		env:        env,
+		controller:   controller,
+		handler:      handler,
+		kafka:        kafka,
+		env:          env,
+		kafkaHandler: kafkaHandler,
 	}
 }
 
@@ -25,7 +27,5 @@ func (tr TaskRouter) Setup() {
 	group := tr.handler.Gin.Group("")
 	group.GET("/kafka", tr.controller.TestReplyTopic)
 
-	kafkaHandler := NewKafkaHandler()
-
-	go tr.kafka.Consume(kafkaHandler, lib.Testtopics[:])
+	go tr.kafka.Consume(tr.kafkaHandler, lib.Testtopics[:])
 }

@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"main/lib"
 
@@ -34,7 +35,9 @@ func (tc *TaskController) TestReplyTopic(c *gin.Context) {
 
 func (tc *TaskController) TestConsumeTopic(replyTopic string, message []byte) {
 	fmt.Println("getting message from test topic:", string(message))
-	tc.KafkaClient.Send(replyTopic, []byte("all ok"))
+	println("slepping for 5 seconds", string(message))
+	time.Sleep(5 * time.Second)
+	println("sleeping done", string(message))
 }
 
 func (tc *TaskController) TestSecondTopic(replyTopic string, message []byte) {
