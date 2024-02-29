@@ -11,11 +11,11 @@ type EventHandler struct {
 	controller controller.TaskController
 }
 
-func (handler EventHandler) Setup(sarama.ConsumerGroupSession) error {
+func (handler EventHandler) Setup(session sarama.ConsumerGroupSession) error {
 	return nil
 }
 
-func (handler EventHandler) Cleanup(sarama.ConsumerGroupSession) error {
+func (handler EventHandler) Cleanup(session sarama.ConsumerGroupSession) error {
 	return nil
 }
 

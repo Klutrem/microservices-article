@@ -54,7 +54,10 @@ func (cl *KafkaClient) Consume(handler KafkaHandler, topics []string) {
 	defer cl.consumerGroup.Close()
 
 	for {
-		cl.consumerGroup.Consume(context.Background(), topics[:], handler)
+		err := cl.consumerGroup.Consume(context.Background(), topics, handler)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"main/domain"
 	"main/internal/tokenutil"
 
 	"github.com/gin-gonic/gin"
@@ -20,19 +19,19 @@ func JwtAuthMiddleware(publicKey string) gin.HandlerFunc {
 			if authorized {
 				userID, err := tokenutil.ExtractIDFromToken(authToken, publicKey)
 				if err != nil {
-					c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: err.Error()})
+					c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 					c.Abort()
 					return
 				}
-				c.Set("user-id", userID)
+				c.Set("account_id", userID)
 				c.Next()
 				return
 			}
-			c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: err.Error()})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
-		c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "Not authorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unathorized"})
 		c.Abort()
 	}
 }

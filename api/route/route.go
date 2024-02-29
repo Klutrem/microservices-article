@@ -2,7 +2,6 @@ package route
 
 import (
 	TaskRoute "main/api/route/task"
-	UserRoute "main/api/route/user"
 
 	"go.uber.org/fx"
 )
@@ -20,11 +19,9 @@ type Route interface {
 
 func NewRoutes(
 	taskRoutes TaskRoute.TaskRouter,
-	userRoutes UserRoute.UserRouter,
 ) Routes {
 	return Routes{
 		taskRoutes,
-		userRoutes,
 	}
 }
 
