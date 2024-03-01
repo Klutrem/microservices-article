@@ -2,40 +2,46 @@ package lib
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
 
 type Env struct {
-	AppEnv                 string `mapstructure:"APP_ENV"`
-	ServerAddress          string `mapstructure:"SERVER_HOST"`
-	Port                   string `mapstructure:"PORT"`
-	ContextTimeout         int    `mapstructure:"CONTEXT_TIMEOUT"`
-	DBHost                 string `mapstructure:"DB_HOST"`
-	DBPort                 string `mapstructure:"DB_PORT"`
-	DBUser                 string `mapstructure:"DB_USER"`
-	DBPass                 string `mapstructure:"DB_PASS"`
-	DBName                 string `mapstructure:"DB_NAME"`
-	AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
-	RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
-	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
-	PublicKey              string `mapstructure:"PUBLIC_KEY"`
-	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
-	BrokerHost             string `mapstructure:"BROKER_HOST"`
-	BrokerPort             string `mapstructure:"BROKER_PORT"`
-	BrokerUser             string `mapstructure:"BROKER_USER"`
-	BrokerPass             string `mapstructure:"BROKER_PASS"`
-	KafkaGroup             string `mapstructure:"KAFKA_GROUP"`
+	AppEnv        string `mapstructure:"APP_ENV"`
+	ServerAddress string `mapstructure:"SERVER_HOST"`
+	Port          string `mapstructure:"PORT"`
+
+	DBHost string `mapstructure:"DB_HOST"`
+	DBPort string `mapstructure:"DB_PORT"`
+	DBUser string `mapstructure:"DB_USER"`
+	DBPass string `mapstructure:"DB_PASS"`
+	DBName string `mapstructure:"DB_NAME"`
+
+	BrokerHost string `mapstructure:"BROKER_HOST"`
+	BrokerPort string `mapstructure:"BROKER_PORT"`
+	BrokerUser string `mapstructure:"BROKER_USER"`
+	BrokerPass string `mapstructure:"BROKER_PASS"`
+	KafkaGroup string `mapstructure:"KAFKA_GROUP"`
 }
 
 func NewEnv() Env {
 	env := Env{}
 	viper.SetConfigFile(".env")
+	_, err := os.Stat(".env")
+	useEnvFile := !os.IsNotExist(err)
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal("Can't find the file .env : ", err)
+	if useEnvFile {
+		viper.SetConfigType("env")
+		viper.SetConfigName(".env")
+		viper.AddConfigPath(".")
+
+		err := viper.ReadInConfig()
+		if err != nil {
+			log.Fatal("Can't read the .env file: ", err)
+		}
 	}
+
 	viper.AutomaticEnv()
 	err = viper.Unmarshal(&env)
 	if err != nil {
