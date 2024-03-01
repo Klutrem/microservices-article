@@ -8,24 +8,25 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/opentracing/opentracing-go/log"
+	"go.uber.org/zap"
 )
 
 type KafkaClient struct {
 	env           Env
 	client        sarama.Client
 	producer      sarama.AsyncProducer
-	reader        sarama.Consumer
 	consumerGroup sarama.ConsumerGroup
 }
 
 type KafkaHandler interface {
-	Handle(topic string, message []byte)
+	Handle(topic string, message sarama.ConsumerMessage)
 	Setup(sarama.ConsumerGroupSession) error
 	Cleanup(sarama.ConsumerGroupSession) error
 	ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error
 }
 
-func NewKafkaClient(env Env) KafkaClient {
+func NewKafkaClient(env Env, logger Logger) KafkaClient {
+	sarama.Logger = zap.NewStdLog(logger.Desugar().Named("Kafka"))
 	addr := fmt.Sprint(env.BrokerHost, ":", env.BrokerPort)
 	conf := sarama.NewConfig()
 	conf.Consumer.Return.Errors = true
@@ -66,9 +67,20 @@ func (cl KafkaClient) Consume(handler KafkaHandler, topics []string) {
 	}
 }
 
-func (cl *KafkaClient) Send(topic string, message []byte) {
+func (cl *KafkaClient) Send(topic string, message []byte, correlationID string) {
 	value := sarama.StringEncoder(message)
 	cl.producer.Input() <- &sarama.ProducerMessage{
+		Headers: []sarama.RecordHeader{
+			{
+				Key:   []byte("kafka_nest-is-disposed"),
+				Value: []byte("true"),
+			},
+
+			{
+				Key:   []byte("kafka_correlationId"),
+				Value: []byte(correlationID),
+			},
+		},
 		Topic: topic,
 		Value: value,
 	}
@@ -79,6 +91,9 @@ func (cl *KafkaClient) SendWithReply(topic string, message []byte) (response []b
 	cl.producer.Input() <- &sarama.ProducerMessage{
 		Topic: topic,
 		Value: value,
+		Headers: []sarama.RecordHeader{
+			{Key: []byte("kafka_replyTopic"), Value: []byte(topic)},
+		},
 	}
 
 	replyTopic := topic + ".reply"

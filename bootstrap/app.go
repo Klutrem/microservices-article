@@ -58,8 +58,4 @@ func NewApp() Application {
 	return cmd
 }
 
-// func (app *Application) CloseDBConnection() {
-// 	ClosePostgresConnection(app.Postgres)
-// }
-
 var RootApp = NewApp()

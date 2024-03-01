@@ -2,6 +2,7 @@ package TaskRoute
 
 import (
 	"main/api/controller"
+	"main/domain/domainCommon"
 	"main/lib"
 
 	"github.com/IBM/sarama"
@@ -27,18 +28,19 @@ func (handler EventHandler) Cleanup(session sarama.ConsumerGroupSession) error {
 
 func (handler EventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		handler.Handle(msg.Topic, msg.Value)
+		handler.Handle(msg.Topic, *msg)
 		session.MarkMessage(msg, "")
 	}
 	return nil
 }
 
-func (handler EventHandler) Handle(topic string, message []byte) {
+func (handler EventHandler) Handle(topic string, message sarama.ConsumerMessage) {
 	replyTopic := topic + ".reply"
+	msg := domainCommon.KafkaMessage{ConsumerMessage: message, ReplyTopic: replyTopic}
 	switch topic {
 	case lib.TestTopic:
-		handler.controller.TestConsumeTopic(replyTopic, message)
+		handler.controller.TestConsumeTopic(msg)
 	case lib.SecondTopic:
-		handler.controller.TestSecondTopic(replyTopic, message)
+		handler.controller.TestSecondTopic(replyTopic, message.Value)
 	}
 }
