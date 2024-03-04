@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
-	"github.com/opentracing/opentracing-go/log"
 	"go.uber.org/zap"
 )
 
@@ -18,6 +17,7 @@ type KafkaClient struct {
 	client        sarama.Client
 	producer      sarama.AsyncProducer
 	consumerGroup sarama.ConsumerGroup
+	logger pkg.Logger
 }
 
 type KafkaHandler interface {
@@ -34,21 +34,21 @@ func NewKafkaClient(env config.Env, logger pkg.Logger) KafkaClient {
 	conf.Consumer.Return.Errors = true
 	client, err := sarama.NewClient([]string{addr}, conf)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 
 	producer, err := sarama.NewAsyncProducerFromClient(client)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 
 	group, err := sarama.NewConsumerGroupFromClient(env.KafkaGroup, client)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 	go func() {
 		for err := range group.Errors() {
-			log.Error(err)
+			logger.Error(err)
 		}
 	}()
 
@@ -65,7 +65,7 @@ func (cl KafkaClient) Consume(handler KafkaHandler, topics []string) {
 	for {
 		err := cl.consumerGroup.Consume(context.Background(), topics, handler)
 		if err != nil {
-			log.Error(err)
+			cl.logger.Error(err)
 		}
 	}
 }
@@ -100,7 +100,7 @@ func (cl *KafkaClient) SendWithReply(topic string, message []byte) (response []b
 			{Key: []byte("kafka_replyTopic"), Value: []byte(replyTopic)},
 		},
 	}
-	
+
 	consumer, err := sarama.NewConsumerFromClient(cl.client)
 	if err != nil {
 		return nil, err
