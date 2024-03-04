@@ -1,8 +1,6 @@
 package route
 
 import (
-	"main/internal/application/task_controller"
-
 	"go.uber.org/fx"
 )
 
@@ -17,11 +15,10 @@ type Route interface {
 	Setup()
 }
 
+// here should return routers
 func NewRoutes(
-	taskRoutes task_controller.TaskRouter,
 ) Routes {
 	return Routes{
-		taskRoutes,
 	}
 }
 
