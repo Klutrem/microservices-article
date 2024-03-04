@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/IBM/sarama v1.40.0
 	github.com/spf13/viper v1.14.0
 	golang.org/x/crypto v0.10.0 // indirect
 )
@@ -55,7 +55,7 @@ require (
 )
 
 require (
-	github.com/IBM/sarama v1.40.0
+
 	github.com/eapache/go-resiliency v1.3.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230111030713-bf00bc1b83b6 // indirect
 	github.com/eapache/queue v1.1.0 // indirect

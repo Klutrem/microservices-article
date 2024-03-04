@@ -1,0 +1,6 @@
+{
+    "$schema" : "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/golangci-lint.json",
+    "linters": {
+        "presets": ["bugs", "complexity", "performance", "error", "format", "module", "metalinter", "style"]
+    }
+}
