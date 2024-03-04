@@ -4,7 +4,7 @@ import "main/cmd"
 
 func main() {
 
-	err := cmd.RootApp.Command.Execute()
+	err := cmd.StartApp()
 	if err != nil {
 		return
 	}
