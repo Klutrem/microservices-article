@@ -31,6 +31,7 @@ func NewKafkaClient(env config.Env, logger pkg.Logger) KafkaClient {
 	sarama.Logger = zap.NewStdLog(logger.Desugar().Named("Kafka"))
 	addr := fmt.Sprint(env.BrokerHost, ":", env.BrokerPort)
 	conf := sarama.NewConfig()
+	conf.ClientID = env.KafkaGroup
 	conf.Consumer.Return.Errors = true
 	client, err := sarama.NewClient([]string{addr}, conf)
 	if err != nil {
