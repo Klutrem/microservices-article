@@ -22,7 +22,10 @@ func Run() interface{} {
 		env lib.Env,
 	) {
 		route.Setup()
-		router.Gin.Run(":" + env.Port)
+		err := router.Gin.Run(":" + env.Port)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -36,7 +39,12 @@ func GetCobraCommand(opt fx.Option) *cobra.Command {
 			ctx := context.Background()
 			app := fx.New(opt, opts)
 			err := app.Start(ctx)
-			defer app.Stop(ctx)
+			defer func() {
+				err := app.Stop(ctx)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}()
 			if err != nil {
 				log.Fatal(err)
 			}

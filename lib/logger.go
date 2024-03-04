@@ -143,7 +143,7 @@ func newLogger(env Env) Logger {
 	}
 
 	logLevel := os.Getenv("LOG_LEVEL")
-	level := zap.PanicLevel
+	var level zapcore.Level
 	switch logLevel {
 	case "debug":
 		level = zapcore.DebugLevel
