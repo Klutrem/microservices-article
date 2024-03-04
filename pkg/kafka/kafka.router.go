@@ -1,8 +1,8 @@
-package domainCommon
+package kafka
 
 import (
 	"errors"
-	"main/lib"
+	"main/pkg"
 
 	"github.com/IBM/sarama"
 )
@@ -11,11 +11,11 @@ type KafkaReplyHandlerFunc func(message KafkaMessage) (response []byte, err erro
 
 type KafkaRouter struct {
 	replyHandlers map[string]KafkaReplyHandlerFunc
-	kafkaClient   lib.KafkaClient
-	logger        lib.Logger
+	kafkaClient   KafkaClient
+	logger        pkg.Logger
 }
 
-func NewKafkaRouter(logger lib.Logger, kafkaClient lib.KafkaClient) KafkaRouter {
+func NewKafkaRouter(logger pkg.Logger, kafkaClient KafkaClient) KafkaRouter {
 	return KafkaRouter{
 		replyHandlers: make(map[string]KafkaReplyHandlerFunc),
 		logger:        logger,

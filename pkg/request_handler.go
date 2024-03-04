@@ -1,4 +1,4 @@
-package lib
+package pkg
 
 import (
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,7 @@ type RequestHandler struct {
 }
 
 // NewRequestHandler creates a new request handler
-func NewRequestHandler(logger Logger, huy string) RequestHandler {
+func NewRequestHandler(logger Logger) RequestHandler {
 	gin.DefaultWriter = logger.GetGinLogger()
 	engine := gin.New()
 	return RequestHandler{Gin: engine}

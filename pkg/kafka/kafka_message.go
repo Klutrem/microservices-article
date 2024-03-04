@@ -1,4 +1,4 @@
-package domainCommon
+package kafka
 
 import (
 	"github.com/IBM/sarama"

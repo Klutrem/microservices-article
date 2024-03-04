@@ -1,11 +1,11 @@
-package bootstrap
+package cmd
 
 import (
 	"context"
 	"log"
-	"main/lib"
-
-	"main/api/route"
+	route "main/internal/application"
+	"main/internal/config"
+	"main/pkg"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/fx"
@@ -18,8 +18,8 @@ type Application struct {
 func Run() interface{} {
 	return func(
 		route route.Routes,
-		router lib.RequestHandler,
-		env lib.Env,
+		router pkg.RequestHandler,
+		env config.Env,
 	) {
 		route.Setup()
 		err := router.Gin.Run(":" + env.Port)

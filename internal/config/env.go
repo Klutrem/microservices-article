@@ -1,10 +1,11 @@
-package lib
+package config
 
 import (
 	"log"
 	"os"
 
 	"github.com/spf13/viper"
+	"go.uber.org/fx"
 )
 
 type Env struct {
@@ -54,3 +55,7 @@ func NewEnv() Env {
 
 	return env
 }
+
+var Module = fx.Options(
+	fx.Provide(NewEnv),
+)

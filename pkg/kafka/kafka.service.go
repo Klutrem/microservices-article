@@ -1,9 +1,11 @@
-package lib
+package kafka
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"main/internal/config"
+	"main/pkg"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -12,7 +14,7 @@ import (
 )
 
 type KafkaClient struct {
-	env           Env
+	env           config.Env
 	client        sarama.Client
 	producer      sarama.AsyncProducer
 	consumerGroup sarama.ConsumerGroup
@@ -25,7 +27,7 @@ type KafkaHandler interface {
 	ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error
 }
 
-func NewKafkaClient(env Env, logger Logger) KafkaClient {
+func NewKafkaClient(env config.Env, logger pkg.Logger) KafkaClient {
 	sarama.Logger = zap.NewStdLog(logger.Desugar().Named("Kafka"))
 	addr := fmt.Sprint(env.BrokerHost, ":", env.BrokerPort)
 	conf := sarama.NewConfig()
@@ -49,6 +51,7 @@ func NewKafkaClient(env Env, logger Logger) KafkaClient {
 			log.Error(err)
 		}
 	}()
+
 	return KafkaClient{
 		env:           env,
 		producer:      producer,
@@ -88,15 +91,16 @@ func (cl *KafkaClient) Send(topic string, message []byte, correlationID string) 
 
 func (cl *KafkaClient) SendWithReply(topic string, message []byte) (response []byte, err error) {
 	value := sarama.StringEncoder(message)
+	
+	replyTopic := topic + ".reply"
 	cl.producer.Input() <- &sarama.ProducerMessage{
 		Topic: topic,
 		Value: value,
 		Headers: []sarama.RecordHeader{
-			{Key: []byte("kafka_replyTopic"), Value: []byte(topic)},
+			{Key: []byte("kafka_replyTopic"), Value: []byte(replyTopic)},
 		},
 	}
-
-	replyTopic := topic + ".reply"
+	
 	consumer, err := sarama.NewConsumerFromClient(cl.client)
 	if err != nil {
 		return nil, err
