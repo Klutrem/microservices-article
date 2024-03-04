@@ -5,6 +5,5 @@ import (
 )
 
 var Module = fx.Options(
-	fx.Provide(NewRequestHandler),
 	fx.Provide(GetLogger),
 )

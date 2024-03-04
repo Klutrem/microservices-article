@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"context"
-	"log"
 	route "main/internal/application"
 	"main/internal/config"
-	"main/pkg"
 
 	"go.uber.org/fx"
 )
@@ -14,14 +12,9 @@ import (
 func Run() any {
 	return func(
 		route route.Routes,
-		router pkg.RequestHandler,
 		env config.Env,
 	) {
 		route.Setup()
-		err := router.Gin.Run(":" + env.Port)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 }
 

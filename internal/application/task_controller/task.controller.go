@@ -2,7 +2,6 @@ package task_controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"main/pkg/kafka"
 )
 
@@ -22,7 +21,7 @@ type dto struct {
 }
 
 func (tc *TaskController) TestConsumeTopic(message kafka.KafkaMessage) (response []byte, err error) {
-	println("slepping for 5 seconds", string(message.Value))
+	println("getting message from firstTopic", string(message.Value))
 	resp := dto{
 		Name:    "test",
 		Surname: "test",
@@ -36,5 +35,5 @@ func (tc *TaskController) TestConsumeTopic(message kafka.KafkaMessage) (response
 }
 
 func (tc *TaskController) TestSecondTopic(replyTopic string, message []byte) {
-	fmt.Println("getting message from second topic:", string(message))
+	println("getting message from second topic:", string(message))
 }

@@ -11,20 +11,17 @@ import (
 
 type TaskRouter struct {
 	controller TaskController
-	handler    pkg.RequestHandler
 	kafka      kafka.KafkaClient
 	logger     pkg.Logger
 	env config.Env
 }
 
 func NewTaskRouter(controller TaskController,
-	handler pkg.RequestHandler, 
 	env config.Env, 
 	kafka kafka.KafkaClient, 
 	logger pkg.Logger) TaskRouter {
 	return TaskRouter{
 		controller: controller,
-		handler:    handler,
 		kafka:      kafka,
 		env:        env,
 		logger:     logger,
@@ -37,5 +34,5 @@ func (tr TaskRouter) Setup() {
 	kafkaRouter := kafka.NewKafkaRouter(tr.logger, tr.kafka)
 	kafkaRouter.RegisterReplyHandler(firstTopic, tr.controller.TestConsumeTopic)
 
-	go tr.kafka.Consume(kafkaRouter, TaskTopics[:])
+	tr.kafka.Consume(kafkaRouter, TaskTopics[:])
 }

@@ -62,11 +62,9 @@ func NewKafkaClient(env config.Env, logger pkg.Logger) KafkaClient {
 
 func (cl KafkaClient) Consume(handler KafkaHandler, topics []string) {
 	defer cl.consumerGroup.Close()
-	for {
-		err := cl.consumerGroup.Consume(context.Background(), topics, handler)
-		if err != nil {
-			cl.logger.Error(err)
-		}
+	err := cl.consumerGroup.Consume(context.Background(), topics, handler)
+	if err != nil {
+		cl.logger.Error(err)
 	}
 }
 
