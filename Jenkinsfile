@@ -15,6 +15,7 @@ podTemplate(containers: [
   volumes: [
     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
   ], hostNetwork: true)  {
+    node(POD_LABEL) {
     if (BRANCH_NAME.contains('PR')) {
         BRANCH = CHANGE_BRANCH
     } else {
@@ -30,7 +31,6 @@ podTemplate(containers: [
 			sh "curl -L ${env.GIT_SCHEME}${env.GIT_HOST}/Jenkins/jenkins-tools/raw/branch/master/helpers.groovy -o $helpersPath"
 			helpers = load helpersPath
 
-    node(POD_LABEL) {
       /* -------------------------------------------------------------------------- */
       /*                                    pull                                    */
       /* -------------------------------------------------------------------------- */
