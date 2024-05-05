@@ -10,22 +10,26 @@ import (
 	"go.uber.org/fx/fxevent"
 )
 
-
 func Run() any {
 	return func(
 		route route.Routes,
 		env config.Env,
 		logger pkg.Logger,
+		handler pkg.RequestHandler,
 	) {
 		route.Setup()
+		err := handler.Gin.Run(":" + env.Port)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
 	}
 }
-
 
 func StartApp() error {
 	logger := pkg.GetLogger(config.NewEnv())
 	opts := fx.Options(
-		fx.WithLogger(func () fxevent.Logger  {
+		fx.WithLogger(func() fxevent.Logger {
 			return logger.GetFxLogger()
 		}),
 		fx.Invoke(Run()),

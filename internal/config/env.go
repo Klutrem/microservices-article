@@ -12,18 +12,6 @@ type Env struct {
 	AppEnv        string `mapstructure:"APP_ENV"`
 	ServerAddress string `mapstructure:"SERVER_HOST"`
 	Port          string `mapstructure:"PORT"`
-
-	DBHost string `mapstructure:"DB_HOST"`
-	DBPort string `mapstructure:"DB_PORT"`
-	DBUser string `mapstructure:"DB_USER"`
-	DBPass string `mapstructure:"DB_PASS"`
-	DBName string `mapstructure:"DB_NAME"`
-
-	BrokerHost string `mapstructure:"BROKER_HOST"`
-	BrokerPort string `mapstructure:"BROKER_PORT"`
-	BrokerUser string `mapstructure:"BROKER_USER"`
-	BrokerPass string `mapstructure:"BROKER_PASS"`
-	KafkaGroup string `mapstructure:"KAFKA_GROUP"`
 }
 
 func NewEnv() Env {
@@ -42,6 +30,8 @@ func NewEnv() Env {
 			log.Fatal("Can't read the .env file: ", err)
 		}
 	}
+
+	env.Port = "3000"
 
 	viper.AutomaticEnv()
 	err = viper.Unmarshal(&env)

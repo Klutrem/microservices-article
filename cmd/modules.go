@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	route "main/internal/application"
+	"main/internal/application"
 	"main/internal/config"
 	"main/pkg"
 
@@ -11,5 +11,5 @@ import (
 var CommonModules = fx.Options(
 	config.Module,
 	pkg.Module,
-	route.Module,
+	application.Module,
 )

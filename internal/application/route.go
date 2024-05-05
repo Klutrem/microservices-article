@@ -1,4 +1,4 @@
-package route
+package application
 
 import (
 	"go.uber.org/fx"
@@ -6,6 +6,8 @@ import (
 
 var Module = fx.Options(
 	fx.Provide(NewRoutes),
+	fx.Provide(NewControllerRoutes),
+	fx.Provide(NewController),
 )
 
 type Routes []Route
@@ -16,9 +18,9 @@ type Route interface {
 }
 
 // here should return routers
-func NewRoutes(
-) Routes {
+func NewRoutes(controllerRoutes ControllerRoutes) Routes {
 	return Routes{
+		controllerRoutes,
 	}
 }
 
