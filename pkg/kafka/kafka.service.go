@@ -2,13 +2,12 @@ package kafka
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"main/internal/config"
 	"main/pkg"
-	"time"
 
 	"github.com/IBM/sarama"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -17,7 +16,7 @@ type KafkaClient struct {
 	client        sarama.Client
 	producer      sarama.AsyncProducer
 	consumerGroup sarama.ConsumerGroup
-	logger pkg.Logger
+	logger        pkg.Logger
 }
 
 type KafkaHandler interface {
@@ -29,10 +28,12 @@ type KafkaHandler interface {
 
 func NewKafkaClient(env config.Env, logger pkg.Logger) KafkaClient {
 	sarama.Logger = zap.NewStdLog(logger.Desugar().Named("Kafka"))
+
 	addr := fmt.Sprint(env.BrokerHost, ":", env.BrokerPort)
 	conf := sarama.NewConfig()
-	conf.ClientID = env.KafkaGroup
+	conf.ClientID = uuid.NewString()
 	conf.Consumer.Return.Errors = true
+
 	client, err := sarama.NewClient([]string{addr}, conf)
 	if err != nil {
 		logger.Error(err)
@@ -62,10 +63,11 @@ func NewKafkaClient(env config.Env, logger pkg.Logger) KafkaClient {
 }
 
 func (cl KafkaClient) Consume(handler KafkaHandler, topics []string) {
-	defer cl.consumerGroup.Close()
-	err := cl.consumerGroup.Consume(context.Background(), topics, handler)
-	if err != nil {
-		cl.logger.Error(err)
+	for {
+		err := cl.consumerGroup.Consume(context.Background(), topics, handler)
+		if err != nil {
+			cl.logger.Error(err)
+		}
 	}
 }
 
@@ -86,42 +88,4 @@ func (cl *KafkaClient) Send(topic string, message []byte, correlationID string) 
 		Topic: topic,
 		Value: value,
 	}
-}
-
-func (cl *KafkaClient) SendWithReply(topic string, message []byte) (response []byte, err error) {
-	value := sarama.StringEncoder(message)
-	
-	replyTopic := topic + ".reply"
-	cl.producer.Input() <- &sarama.ProducerMessage{
-		Topic: topic,
-		Value: value,
-		Headers: []sarama.RecordHeader{
-			{Key: []byte("kafka_replyTopic"), Value: []byte(replyTopic)},
-		},
-	}
-
-	consumer, err := sarama.NewConsumerFromClient(cl.client)
-	if err != nil {
-		return nil, err
-	}
-	defer consumer.Close()
-	offset := sarama.OffsetNewest
-	partitionConsumer, err := consumer.ConsumePartition(replyTopic, 0, offset)
-	if err != nil {
-		consumer.Close()
-		return nil, err
-	}
-	defer partitionConsumer.Close()
-
-	select {
-	case msg := <-partitionConsumer.Messages():
-		response = msg.Value
-	case <-time.After(time.Second * 60):
-		consumer.Close()
-		return nil, errors.New("timeout waiting for reply message")
-	}
-	consumer.Close()
-
-	return response, nil
-
 }
