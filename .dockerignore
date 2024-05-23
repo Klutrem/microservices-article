@@ -1,0 +1,9 @@
+.env*
+Jenkinsfile
+README.md
+.vscode
+.idea
+*_test.go
+.golangci.json
+dist/*
+node_modules/*
